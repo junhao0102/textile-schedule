@@ -3,14 +3,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import streamlit as st
 import math
-
 from st_aggrid import AgGrid
 from pathlib import Path
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.linear_model import LinearRegression
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_squared_error , mean_absolute_error, r2_score
-from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
+
 from model import random_forest,linear_regression
 current_path = Path(__file__).resolve().parent
 
@@ -96,8 +91,6 @@ def upload_data(uploaded, fk):
         df_data = None
     return df_data
 
-
-
 #----根據機器預測不同機器對不同訂單的轉速---
 def predict_rotation(history, order_data,machine_data):
     predict_df = pd.DataFrame()
@@ -123,8 +116,6 @@ def predict_feedoil(history, order_data,machine_data):
     num_machines = machine_data['機台編號'].unique().size
     predict_df = random_forest(num_machines,history,order_data,['布重(克/平方米)', '丹尼數(D)'],['喂油量 (毫升/小時)'])
     return  predict_df
-
-
 
 #----將機器號和訂單數據合併為一個單一的 DataFrame----
 def machine_order(machine_data,order_data):
@@ -158,7 +149,6 @@ def machine_order(machine_data,order_data):
     df = pd.merge(df, df, on=['機台編號', '訂單編號'], how='left')
     return df
 
-
 #----合併----
 def merge_DF(df0,df1,df2,df3,df4):
     df = pd.concat([df0,df1,df2,df3,df4],axis=1)
@@ -166,15 +156,9 @@ def merge_DF(df0,df1,df2,df3,df4):
 
 #----預測時間----
 def predict_time(history,order_data,time):
-
     #----預測訂單的締造時間和瑕疵數---
-    X = history[['織造數量(米)','布重(克/平方米)','丹尼數(D)','針數(針/吋)']]
-    Y = history['織造時間(小時)']
-    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
-    model = LinearRegression()
-    model.fit(X_train,Y_train)
-    time = model.predict(order_data[['織造數量(米)','布重(克/平方米)','丹尼數(D)','針數(針/吋)']])
-
+    time = pd.DataFrame()
+    time = linear_regression(history,order_data,['織造數量(米)','布重(克/平方米)','丹尼數(D)','針數(針/吋)'],['織造時間(小時)'])
     #----整合資料----
     time = np.ceil(time)
     time = pd.DataFrame(time, columns=['織造時間(小時)'])
@@ -183,15 +167,10 @@ def predict_time(history,order_data,time):
     time["織造時間(天)"] = time["織造時間(天)"].apply(math.ceil)
     return time
 
-
+#----預測瑕疵數----
 def predict_flaw(history,time):
-    X = history[['織造數量(米)','布重(克/平方米)', '丹尼數(D)', '針數(針/吋)','織造時間(小時)']]  
-    Y = history['瑕疵數']
-    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
-    model = LinearRegression()
-    model.fit(X_train,Y_train)
-    flaw = model.predict(time[['織造數量(米)','布重(克/平方米)', '丹尼數(D)', '針數(針/吋)','織造時間(小時)']])
-
+    flaw = pd.DataFrame()
+    flaw = linear_regression(history,time,['織造數量(米)','布重(克/平方米)', '丹尼數(D)', '針數(針/吋)','織造時間(小時)'],['瑕疵數'])
     #----整合資料----
     flaw = np.ceil(flaw)
     flaw = pd.DataFrame(flaw, columns=['瑕疵數'])
@@ -199,10 +178,9 @@ def predict_flaw(history,time):
     return flaw
     
     
-#----繪製最後預測參數----    
+#----最後預測參數----    
 def final(machine_assignments,merge_data,time):
     # 解析資料，建立字典
-    # print(machine_assignments)
     parsed_data = []
     for machine_number ,orders in enumerate(machine_assignments):
         for order in orders:
@@ -213,8 +191,7 @@ def final(machine_assignments,merge_data,time):
                 '預計織造數量(米)': order['length'],
                 '預估織造時間(小時)': order['duration_hour'],
                 '預計瑕疵數': order['flaw'],    
-            })
-                               
+            })                   
     df = pd.DataFrame(parsed_data)
     df = df.sort_values(by=['幾日後開始生產'])
     for index, row in df.iterrows():

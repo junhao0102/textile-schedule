@@ -23,13 +23,11 @@ df2 = predict_linepower(history, order_data, machine_data)
 df3 = predict_feedyarn(history, order_data, machine_data)
 df4 = predict_feedoil(history, order_data, machine_data)
 data = merge_DF(df0,df1,df2,df3,df4)
-st.write(data)
-# data= merge_data(df1,df2,df3,df4)
-# time = predict_time(history,order_data,data)
-# predict_data = predict_flaw(history,time)
-# jobs, num_machines, initial_waiting_time = schedule_info(predict_data,machine_data)
-# machine_assignments = schedule(jobs, num_machines, initial_waiting_time)
-# st.write(final (machine_assignments,data,predict_data))
+time = predict_time(history,order_data,data)
+predict_data = predict_flaw(history,time)
+jobs, num_machines, initial_waiting_time = schedule_info(predict_data,machine_data)
+machine_assignments = schedule(jobs, num_machines, initial_waiting_time)
+st.write(final (machine_assignments,data,predict_data))
 
 
 

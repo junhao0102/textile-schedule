@@ -73,14 +73,12 @@ else:
                 """, unsafe_allow_html=True)
         if st.button('執行優化'):
             with st.spinner('資料上傳中，請稍後'):
-                history = upload_data(uploaded_history, 'history')
-                order_data = upload_data(uploaded_order, 'order')
-                machine_data = upload_data(uploaded_machine, 'machine')
-            #----try用戶的資料是否正確----
-            try:
+                    history = upload_data(uploaded_history, 'history')
+                    order_data = upload_data(uploaded_order, 'order')
+                    machine_data = upload_data(uploaded_machine, 'machine') 
+            if history is not None and order_data is not None and machine_data is not None:   
                 optimize(history, order_data, machine_data)
-            except:
-                st.error('請上傳正確的資料集與格式。')
+            
     else:
         st.info('請上傳所有必要的檔案。')
                 

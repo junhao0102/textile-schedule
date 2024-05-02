@@ -81,9 +81,8 @@ def upload_data(uploaded, fk):
             df_data = pd.read_excel(
                 uploaded, engine=def_engine)
         else:
+            st.error(f'請輸入正確的檔案格式: csv, xlsx, xls 格式')
             df_data = None
-    else:
-        df_data = None
     return df_data
 
 #----根據機器預測不同機器對不同訂單的轉速---
@@ -178,22 +177,27 @@ def predict_flaw(history,time):
 #----優化執行----
 def optimize(history, order_data, machine_data):
     with st.spinner('優化中，請稍後'):
-        #----資料預測----
-        df0 = machine_order(machine_data, order_data)
-        df1 = predict_rotation(history, order_data, machine_data)
-        df2 = predict_linepower(history, order_data, machine_data)
-        df3 = predict_feedyarn(history, order_data, machine_data)
-        df4 = predict_feedoil(history, order_data, machine_data)
-        #----合併資料----
-        merge_data = merge_DF(df0, df1, df2, df3, df4)
-        time = predict_time(history, order_data, merge_data)
-        predict_data = predict_flaw(history, time)
-        #----排程----
-        machine_assignments = schedule(predict_data, machine_data)
-        result=  dataframe_print(machine_assignments, merge_data)
-        plot_gantt_chart(machine_assignments)
-        st.write(result)
-        return result
+        try:
+            #----資料預測----
+            df0 = machine_order(machine_data, order_data)
+            df1 = predict_rotation(history, order_data, machine_data)
+            df2 = predict_linepower(history, order_data, machine_data)
+            df3 = predict_feedyarn(history, order_data, machine_data)
+            df4 = predict_feedoil(history, order_data, machine_data)
+            #----合併資料----
+            merge_data = merge_DF(df0, df1, df2, df3, df4)
+            time = predict_time(history, order_data, merge_data)
+            predict_data = predict_flaw(history, time)
+            #----排程----
+            machine_assignments = schedule(predict_data, machine_data)
+            result=  dataframe_print(machine_assignments, merge_data)
+            plot_gantt_chart(machine_assignments)
+            st.write(result)
+            return result
+        except:
+            st.error('預測失敗，請檢察資料是否匹配')
+    
+        
 
 #----統整dataframe列印----    
 def dataframe_print(machine_assignments,merge_data):

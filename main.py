@@ -8,7 +8,7 @@ from fun import load_sample_data,load_data,optimize,upload_data
 current_path = Path(__file__).resolve().parent
 
 st.set_page_config(layout="wide", page_title='針織機效率與品質導向參數優化模組 ')
-st.header(":blue[針織機效率與品質導向參數優化模組](Full)")
+st.header(":blue[針織機效率與品質導向參數優化模組(Full)]")
 st.subheader("智慧設備暨系統雲端加值服務技術開發計畫")
 st.markdown("    Copyright © Institute for Information Industry")
 st.markdown(" " )

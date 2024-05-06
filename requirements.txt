@@ -7,4 +7,4 @@ streamlit==1.23.1
 streamlit-aggrid==0.3.4.post3
 numpy==1.24.3
 streamlit-option-menu==0.3.6
-
+openpyxl==3.1.0

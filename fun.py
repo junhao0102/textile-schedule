@@ -14,7 +14,6 @@ current_path = Path(__file__).resolve().parent
 
 
 # ---- 資料匯入 ----
-@st.cache_data
 def load_sample_data():
     history = pd.read_excel(
             f'{current_path}//sample//history.xlsx',
